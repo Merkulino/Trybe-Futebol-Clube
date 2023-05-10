@@ -18,7 +18,7 @@ describe('Tests of teams', () => {
     sinon.restore();
   });
 
-  it('Returns all teams', async () => {
+  it.only('Returns all teams', async () => {
     sinon.stub(Teams, 'findAll').resolves(allTeams);
     const responseHttp = await chai.request(app).get('/teams');
 
