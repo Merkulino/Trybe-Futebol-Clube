@@ -18,12 +18,12 @@ describe('Tests of teams', () => {
     sinon.restore();
   });
 
-  it.only('Returns all teams', async () => {
+  it('Returns all teams', async () => {
     sinon.stub(Teams, 'findAll').resolves(allTeams);
     const responseHttp = await chai.request(app).get('/teams');
 
     expect(responseHttp.status).to.be.equals(200);
-    expect(responseHttp).to.deep.equal(allTeams);
+    expect(responseHttp.body).to.deep.equal(allTeams);
   });
   
   it('Returns specific team by his id', async () => {
@@ -31,7 +31,7 @@ describe('Tests of teams', () => {
     const responseHttp = await chai.request(app).get('/teams/3');
 
     expect(responseHttp.status).to.be.equals(200);
-    expect(responseHttp).to.deep.equal(allTeams[2]);
+    expect(responseHttp.body).to.deep.equal(allTeams[2]);
   });
   
   /**
