@@ -13,7 +13,8 @@ describe('a login test', () => {
     // sinon.stub(ClasseToken, 'generateToken').resolves(tokenMock)
 
     const response = await chai.request(app).post('/login')
-    .set('Authorization', tokenMock).send({ body: loginMock});
+    // .set('Authorization', tokenMock)
+    .send({ body: loginMock});
 
     expect(response.status).to.be.equals(200);
     expect(response.body.token).to.be.equals(tokenMock);
@@ -25,7 +26,8 @@ describe('a login test', () => {
     // sinon.stub(ClasseToken, 'generateToken').resolves(tokenMock)
 
     const response = await chai.request(app).post('/login')
-    .set('Authorization', tokenMock).send({ body: { password: '123' } });
+    // .set('Authorization', tokenMock)
+    .send({ body: { password: '123' } });
 
     expect(response.status).to.be.equals(400);
     expect(response.body).to.be.equals({ "message": "All fields must be filled" });
@@ -37,7 +39,8 @@ describe('a login test', () => {
     // sinon.stub(ClasseToken, 'generateToken').resolves(tokenMock)
 
     const response = await chai.request(app).post('/login')
-    .set('Authorization', tokenMock).send({ body: { email: 'mail@mail.com' } });
+    // .set('Authorization', tokenMock)
+    .send({ body: { email: 'mail@mail.com' } });
 
     expect(response.status).to.be.equals(400);
     expect(response.body).to.be.equals({ "message": "All fields must be filled" });
@@ -59,7 +62,8 @@ describe('a login test', () => {
     // sinon.stub(ClasseToken, 'generateToken').resolves(tokenMock)
 
     const response = await chai.request(app).post('/login')
-    .set('Authorization', tokenMock).send({ body: loginMock});
+    // .set('Authorization', tokenMock)
+    .send({ body: loginMock});
 
     expect(response.status).to.be.equals(401);
     expect(response.body).to.be.equals({ "message": "Invalid email or password" });
@@ -80,7 +84,8 @@ describe('a login test', () => {
     // sinon.stub(ClasseToken, 'generateToken').resolves(tokenMock)
 
     const response = await chai.request(app).get('/login/role')
-    .set('authorization', tokenMock);
+    // .set('authorization', tokenMock)
+    ;
 
     expect(response.status).to.be.equals(200);
     expect(response.body).to.be.deep.equal({ role: 'admin' });
