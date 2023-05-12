@@ -14,7 +14,7 @@ const includeTeam = (team: string) => ({
 const INCLUDE_HOME_AWAY_TEAM = { include: [includeTeam('homeTeam'), includeTeam('awayTeam')] };
 
 export default class MatchesService {
-  public static async allMatches():Promise<TypeMatchesResponse | TypeResponse> {
+  public static async allMatches(): Promise<TypeMatchesResponse | TypeResponse> {
     const matches = await Matches.findAll(INCLUDE_HOME_AWAY_TEAM);
 
     if (!matches) return { type: 500, message: 'some error sei la' };
@@ -22,9 +22,12 @@ export default class MatchesService {
     return { message: matches };
   }
 
-  public static async matchByProgress(_progress: string):
+  public static async matchByProgress(progress: boolean):
   Promise<TypeResponse | TypeMatchesResponse> {
-    const matches = await Matches.findAll();
+    const matches = await Matches.findAll({
+      ...INCLUDE_HOME_AWAY_TEAM,
+      where: { inProgress: progress },
+    });
 
     if (!matches) return { type: 500, message: 'some ersror sei la' };
 
