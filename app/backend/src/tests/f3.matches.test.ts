@@ -6,6 +6,8 @@ import chaiHttp = require('chai-http');
 import { app } from '../app';
 import Matches from '../database/models/Matches';
 import { allMatches, matchesInProgressMock } from './Mocks/matches.mock.test';
+import { tokenMock } from './Mocks/user.mock.test';
+import UserService from '../api/service/user.service';
 
 chai.use(chaiHttp);
 
@@ -43,5 +45,115 @@ describe('matches tests', () => {
     expect(responseHttp.body).to.deep.equal(matchesInProgressMock);
   });
   
+  it('can be possible finish one match', async () => { // Os testes da erro na validação de token
+    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
+
+    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
+    expect(login.status).to.be.equals(200);
+    expect(login.body.token).to.be.equals(tokenMock);
+
+    const responseHttp = await chai
+    .request(app)
+    .patch('/matches/3/finish')
+    .set('Authorization', tokenMock);
+
+    expect(responseHttp.status).to.be.equals(200);
+    expect(responseHttp.body).to.deep.equal({ "message": "Finished" });
+  });
   
+  it('update one match information', async () => { // Os testes da erro na validação de token
+    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
+
+    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
+    expect(login.status).to.be.equals(200);
+    expect(login.body.token).to.be.equals(tokenMock);
+
+    const responseHttp = await chai
+    .request(app)
+    .patch('/matches/1')
+    .set('Authorization', tokenMock)
+    .send({
+      "homeTeamGoals": 3,
+      "awayTeamGoals": 1
+    });
+
+    expect(responseHttp.status).to.be.equals(200);
+    expect(allMatches[0].homeTeamGoals).to.be.equal(3);
+    expect(allMatches[0].awayTeamGoals).to.be.equal(1);
+  });
+  
+  it('add new match in progress', async () => { // Os testes da erro na validação de token
+    sinon.stub(Matches, 'create').resolves();
+    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
+    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
+    expect(login.status).to.be.equals(200);
+    expect(login.body.token).to.be.equals(tokenMock);
+
+    const responseHttp = await chai
+    .request(app)
+    .post('/matches/')
+    .set('Authorization', tokenMock)
+    .send({
+      "homeTeamId": 16, // O valor deve ser o id do time
+      "awayTeamId": 8, // O valor deve ser o id do time
+      "homeTeamGoals": 2,
+      "awayTeamGoals": 2,
+    });
+
+    expect(responseHttp.status).to.be.equals(201);
+    expect(responseHttp.body).to.deep.equal({
+      "id": 1,
+      "homeTeamId": 16,
+      "homeTeamGoals": 2,
+      "awayTeamId": 8,
+      "awayTeamGoals": 2,
+      "inProgress": true,
+    });
+  });
+
+  it('is not possible add two equal teams on one match', async () => { // Os testes da erro na validação de token
+    sinon.stub(Matches, 'create').resolves();
+    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
+    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
+    expect(login.status).to.be.equals(200);
+    expect(login.body.token).to.be.equals(tokenMock);
+
+    const responseHttp = await chai
+    .request(app)
+    .post('/matches/')
+    .set('Authorization', tokenMock)
+    .send({
+      "homeTeamId": 1, // O valor deve ser o id do time
+      "awayTeamId": 1, // O valor deve ser o id do time
+      "homeTeamGoals": 0,
+      "awayTeamGoals": 0,
+    });
+
+    expect(responseHttp.status).to.be.equals(422);
+    expect(responseHttp.body).to.deep.equal({ "message": "It is not possible to create a match with two equal teams" });
+  });
+  
+  it('is not possible add a team that doesnt exist on database', async () => { // Os testes da erro na validação de token
+    sinon.stub(Matches, 'create').resolves();
+    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
+    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
+    expect(login.status).to.be.equals(200);
+    expect(login.body.token).to.be.equals(tokenMock);
+
+    const responseHttp = await chai
+    .request(app)
+    .post('/matches/')
+    .set('Authorization', tokenMock)
+    .send({
+      "homeTeamId": 99999, // O valor deve ser o id do time
+      "awayTeamId": 1, // O valor deve ser o id do time
+      "homeTeamGoals": 0,
+      "awayTeamGoals": 0,
+    });
+
+    expect(responseHttp.status).to.be.equals(422);
+    expect(responseHttp.body).to.deep.equal({ "message": "There is no team with such id!" }
+    );
+  });
+
 });
