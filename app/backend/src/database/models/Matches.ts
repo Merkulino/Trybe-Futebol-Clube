@@ -58,13 +58,13 @@ Matches.init({
   timestamps: false,
 });
 
-Matches.hasOne(Teams, {
-  foreignKey: 'home_team_id',
+Matches.belongsTo(Teams, {
+  foreignKey: 'homeTeamId',
   as: 'homeTeam',
 });
 
-Matches.hasOne(Teams, {
-  foreignKey: 'away_team_id',
+Matches.belongsTo(Teams, {
+  foreignKey: 'awayTeamId',
   as: 'awayTeam',
 });
 
