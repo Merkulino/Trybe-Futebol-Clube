@@ -1,13 +1,13 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
+import * as jwt from 'jsonwebtoken';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
 import Matches from '../database/models/Matches';
 import { allMatches, matchesInProgressMock } from './Mocks/matches.mock.test';
-import { tokenMock } from './Mocks/user.mock.test';
-import UserService from '../api/service/user.service';
+import { tokenMock, userMock } from './Mocks/user.mock.test';
 
 chai.use(chaiHttp);
 
@@ -46,11 +46,7 @@ describe('matches tests', () => {
   });
   
   it('can be possible finish one match', async () => { // Os testes da erro na validação de token
-    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
-
-    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
-    expect(login.status).to.be.equals(200);
-    expect(login.body.token).to.be.equals(tokenMock);
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
     .request(app)
@@ -62,11 +58,7 @@ describe('matches tests', () => {
   });
   
   it('update one match information', async () => { // Os testes da erro na validação de token
-    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
-
-    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
-    expect(login.status).to.be.equals(200);
-    expect(login.body.token).to.be.equals(tokenMock);
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
     .request(app)
@@ -83,11 +75,7 @@ describe('matches tests', () => {
   });
   
   it('add new match in progress', async () => { // Os testes da erro na validação de token
-    sinon.stub(Matches, 'create').resolves();
-    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
-    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
-    expect(login.status).to.be.equals(200);
-    expect(login.body.token).to.be.equals(tokenMock);
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
     .request(app)
@@ -112,11 +100,7 @@ describe('matches tests', () => {
   });
 
   it('is not possible add two equal teams on one match', async () => { // Os testes da erro na validação de token
-    sinon.stub(Matches, 'create').resolves();
-    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
-    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
-    expect(login.status).to.be.equals(200);
-    expect(login.body.token).to.be.equals(tokenMock);
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
     .request(app)
@@ -134,11 +118,7 @@ describe('matches tests', () => {
   });
   
   it('is not possible add a team that doesnt exist on database', async () => { // Os testes da erro na validação de token
-    sinon.stub(Matches, 'create').resolves();
-    sinon.stub(UserService, 'getByEmailAndPassword').resolves({ message: tokenMock });
-    const login = await chai.request(app).post('/login').send({email: 'user@mail.com', password: 'secret_user'});
-    expect(login.status).to.be.equals(200);
-    expect(login.body.token).to.be.equals(tokenMock);
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
     .request(app)

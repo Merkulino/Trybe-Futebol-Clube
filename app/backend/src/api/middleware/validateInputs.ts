@@ -13,11 +13,11 @@ const validateLogin = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const validateTokenMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const validateTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization;
   if (token === undefined) return res.status(401).json({ message: 'Token not found' });
   try {
-    const decode = jwt.verify(token, SECRET_KEY);
+    const decode = await jwt.verify(token, SECRET_KEY); // Await ta ai pra rodar o teste, tenho que refatorar
     req.body.currentUser = decode;
   } catch (error) {
     return res.status(401).json({ message: 'Token must be a valid token' });

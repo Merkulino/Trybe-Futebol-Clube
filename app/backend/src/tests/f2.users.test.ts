@@ -1,5 +1,6 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
+import * as jwt from 'jsonwebtoken';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
@@ -9,6 +10,7 @@ import { app } from '../app';
 import User from '../database/models/User';
 import { loginMock , tokenMock, userMock } from './Mocks/user.mock.test';
 import UserService from '../api/service/user.service';
+import { validateTokenMiddleware } from '../api/middleware/validateInputs';
 
 const { email, password }=  loginMock;
 
@@ -63,19 +65,16 @@ describe('a login test', () => {
     expect(response.body).to.deep.equal({ "message": "Token must be a valid token" });
   });
 
-  // it("get the rigth user 'role' ", async () => {  ---- > Erro na validação do token
-  //   const login = await chai.request(app).post('/login').send({email, password});
+  it("get the rigth user 'role' ", async () => {
+    sinon.stub(jwt, 'verify').resolves(userMock);
 
-  //   expect(login.status).to.be.equals(200);
-  //   expect(login.body.token).to.be.equals(tokenMock);
+    const response = await chai.request(app).get('/login/role')
+    .send({ email, password })
+    .set('Authorization', tokenMock);
 
-  //   const response = await chai.request(app).get('/login/role')
-  //   .send({ email, password })
-  //   .set('Authorization', tokenMock);
-  //   console.log(response.body)
-  //   expect(response.status).to.be.equals(200);
-  //   expect(response.body).to.be.deep.equal({ role: 'admin' });
-  // });
+    expect(response.status).to.be.equals(200);
+    expect(response.body).to.be.deep.equal({ role: 'admin' });
+  });
 
   afterEach(() => {
     sinon.restore();

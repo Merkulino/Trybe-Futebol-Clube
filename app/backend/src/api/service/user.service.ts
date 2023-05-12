@@ -31,7 +31,7 @@ export default class UserService {
 
   public static async getById(id: number): Promise<TypeResponse> {
     const response = await User.findByPk(id);
-    if (!response) return { type: 500, message: 'Has not possible to get role' };
+    if (!response) return { type: 500, message: 'Was not possible to get role' };
     return { message: response.role };
   }
 }
