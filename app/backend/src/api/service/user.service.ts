@@ -19,7 +19,6 @@ export default class UserService {
     });
 
     if (!userThatHasEmail || !hasPassword) {
-      console.log(userThatHasEmail, hasPassword);
       return { type: 401, message: 'Invalid email or password' };
     }
 
