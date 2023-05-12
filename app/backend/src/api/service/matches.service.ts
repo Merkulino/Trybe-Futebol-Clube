@@ -1,7 +1,7 @@
 // import bcrypt = require('bcryptjs');
 // import jwt = require('jsonwebtoken');
 import { TypeMatchesResponse, TypeResponse } from '../../interfaces/types';
-import Matches from '../../database/models/matches';
+import Matches from '../../database/models/Matches';
 import Teams from '../../database/models/TeamsModel';
 
 const includeTeam = (team: string) => ({
