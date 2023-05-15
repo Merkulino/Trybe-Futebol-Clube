@@ -5,7 +5,7 @@ import Teams from './TeamsModel';
 
 export default class Matches extends Model {
   declare id: number;
-  declare homeTeamsId: number;
+  declare homeTeamId: number;
   declare homeTeamGoals: number;
   declare awayTeamId: number;
   declare awayTeamGoals: number;
@@ -19,7 +19,7 @@ Matches.init({
     autoIncrement: true,
     primaryKey: true,
   },
-  homeTeamsId: {
+  homeTeamId: {
     type: DataTypes.NUMBER,
     field: 'home_team_id',
     allowNull: false,
@@ -49,7 +49,7 @@ Matches.init({
   },
   inProgress: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    defaultValue: true,
   },
 }, {
   underscored: true,

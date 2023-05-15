@@ -1,6 +1,6 @@
 import * as express from 'express';
 import MatchesController from '../controller/matches.controller';
-import { validateTokenMiddleware } from '../middleware/validateInputs';
+import { validateTeamsIdOnNewMatch, validateTokenMiddleware } from '../middleware/validateInputs';
 
 const router = express.Router();
 
@@ -12,6 +12,14 @@ const router = express.Router();
 router.get(
   '/',
   (req, res) => MatchesController.allMatches(req, res),
+);
+
+router.post(
+  '/',
+  validateTokenMiddleware,
+  validateTeamsIdOnNewMatch,
+  // Funcionalidade extra: validar campos da requisição
+  (req, res) => MatchesController.newMatch(req, res),
 );
 
 router.get(

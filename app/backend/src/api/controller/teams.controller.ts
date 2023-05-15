@@ -4,12 +4,12 @@ import TeamsService from '../service/teams.service';
 export default class TeamsController {
   static async getAll(_req: Request, res: Response) {
     const response = await TeamsService.getAll();
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }
 
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
     const response = await TeamsService.getById(Number(id));
-    res.status(200).json(response);
+    return res.status(200).json(response);
   }
 }

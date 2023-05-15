@@ -38,4 +38,11 @@ export default class MatchesController {
     if (type) return res.status(type).json({ message });
     return res.status(200).send({ message });
   }
+
+  static async newMatch(req: Request, res: Response) {
+    const dataTeams = req.body;
+    const { type, message } = await MatchesService.newMatch(dataTeams);
+    if (type) return res.status(type).json({ message });
+    return res.status(200).send(message);
+  }
 }

@@ -20,6 +20,13 @@ type homeAwayGoalsType = {
   awayTeamGoals: number,
 };
 
+type newTeamsType = {
+  homeTeamId: number,
+  awayTeamId: number,
+  homeTeamGoals: number,
+  awayTeamGoals: number,
+};
+
 export default class MatchesService {
   public static async allMatches(): Promise<TypeMatchesResponse | TypeResponse> {
     const matches = await Matches.findAll(INCLUDE_HOME_AWAY_TEAM);
@@ -65,5 +72,19 @@ export default class MatchesService {
     if (!matches) return { type: 500, message: ERROR_SERVER_MESSAGE };
 
     return { message: 'Match updated!' };
+  }
+
+  public static async newMatch(dataTeams: newTeamsType):
+  Promise<TypeResponse | TypeMatchesResponse> {
+    const { dataValues } = await Matches.create({
+      homeTeamId: dataTeams.homeTeamId,
+      homeTeamGoals: dataTeams.homeTeamGoals,
+      awayTeamId: dataTeams.awayTeamId,
+      awayTeamGoals: dataTeams.awayTeamGoals,
+    });
+
+    if (!dataTeams) return { type: 500, message: ERROR_SERVER_MESSAGE };
+
+    return MatchesService.matchById(dataValues.id);
   }
 }
