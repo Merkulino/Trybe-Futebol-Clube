@@ -134,4 +134,25 @@ describe('matches tests', () => {
     );
   });
 
+  describe('Token validation', () => {
+    it('returns an error when token is not passed', async () => {
+      const responseHttp = await chai
+      .request(app)
+      .patch('/matches/3/finish');
+  
+      expect(responseHttp.status).to.be.equals(401);
+      expect(responseHttp.body).to.deep.equal({ message: "Token not found" });
+    });
+
+    it('returns an error when token is invalid', async () => {
+      const responseHttp = await chai
+      .request(app)
+      .patch('/matches/3/finish')
+      .set('Authorization', 'wrongToken');
+  
+      expect(responseHttp.status).to.be.equals(401);
+      expect(responseHttp.body).to.deep.equal({ "message": "Token must be a valid token" });
+    });
+  })
+
 });
