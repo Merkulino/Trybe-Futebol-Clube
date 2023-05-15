@@ -1,3 +1,4 @@
+import { Model } from "sequelize";
 import Matches from "../../database/models/Matches";
 
 const allMatches: Matches[] = [
@@ -96,4 +97,15 @@ const matchesInProgressMock: Matches[] = [
 } as unknown as Matches,
 ];
 
-export { allMatches, matchesInProgressMock };
+const responseNewMatchMock = {
+  dataValues: {
+    inProgress: true,
+    id: 5,
+    homeTeamId: 3,
+    homeTeamGoals: 2,
+    awayTeamId: 1,
+    awayTeamGoals: 2
+  },
+} as Model
+
+export { allMatches, matchesInProgressMock, responseNewMatchMock };

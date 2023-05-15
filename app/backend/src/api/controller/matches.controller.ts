@@ -43,6 +43,6 @@ export default class MatchesController {
     const dataTeams = req.body;
     const { type, message } = await MatchesService.newMatch(dataTeams);
     if (type) return res.status(type).json({ message });
-    return res.status(200).send(message);
+    return res.status(201).send(message);
   }
 }

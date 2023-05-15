@@ -6,8 +6,11 @@ import chaiHttp = require('chai-http');
 
 import { app } from '../app';
 import Matches from '../database/models/Matches';
-import { allMatches, matchesInProgressMock } from './Mocks/matches.mock.test';
+import { allMatches, matchesInProgressMock, responseNewMatchMock } from './Mocks/matches.mock.test';
 import { tokenMock, userMock } from './Mocks/user.mock.test';
+import TeamsService from '../api/service/teams.service';
+import Teams from '../database/models/TeamsModel';
+import { allTeams } from './Mocks/team.mock.test';
 
 chai.use(chaiHttp);
 
@@ -46,6 +49,7 @@ describe('matches tests', () => {
   });
   
   it('can be possible finish one match', async () => { 
+    sinon.stub(Matches, 'update').resolves([1]);
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
@@ -58,6 +62,7 @@ describe('matches tests', () => {
   });
   
   it('update one match information', async () => { 
+    sinon.stub(Matches, 'update').resolves([1]);
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
@@ -73,6 +78,9 @@ describe('matches tests', () => {
   });
   
   it('add new match in progress', async () => { 
+    sinon.stub(Teams, 'findAll').resolves(allTeams);
+    sinon.stub(Matches, 'create').resolves(responseNewMatchMock);
+    sinon.stub(Matches, 'findByPk').resolves(responseNewMatchMock.dataValues);
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
@@ -80,24 +88,25 @@ describe('matches tests', () => {
     .post('/matches/')
     .set('Authorization', tokenMock)
     .send({
-      "homeTeamId": 16, // O valor deve ser o id do time
-      "awayTeamId": 8, // O valor deve ser o id do time
+      "homeTeamId": 3, 
+      "awayTeamId": 1, 
       "homeTeamGoals": 2,
       "awayTeamGoals": 2,
     });
 
     expect(responseHttp.status).to.be.equals(201);
     expect(responseHttp.body).to.deep.equal({
-      "id": 1,
-      "homeTeamId": 16,
+      "id": 5,
+      "homeTeamId": 3,
       "homeTeamGoals": 2,
-      "awayTeamId": 8,
+      "awayTeamId": 1,
       "awayTeamGoals": 2,
       "inProgress": true,
     });
   });
 
   it('is not possible add two equal teams on one match', async () => { 
+    sinon.stub(Teams, 'findAll').resolves(allTeams);
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
@@ -105,8 +114,8 @@ describe('matches tests', () => {
     .post('/matches/')
     .set('Authorization', tokenMock)
     .send({
-      "homeTeamId": 1, // O valor deve ser o id do time
-      "awayTeamId": 1, // O valor deve ser o id do time
+      "homeTeamId": 1, 
+      "awayTeamId": 1, 
       "homeTeamGoals": 0,
       "awayTeamGoals": 0,
     });
@@ -116,6 +125,7 @@ describe('matches tests', () => {
   });
   
   it('is not possible add a team that doesnt exist on database', async () => { 
+    sinon.stub(Teams, 'findByPk').resolves();
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
@@ -123,13 +133,13 @@ describe('matches tests', () => {
     .post('/matches/')
     .set('Authorization', tokenMock)
     .send({
-      "homeTeamId": 99999, // O valor deve ser o id do time
-      "awayTeamId": 1, // O valor deve ser o id do time
+      "homeTeamId": 99999, 
+      "awayTeamId": 1, 
       "homeTeamGoals": 0,
       "awayTeamGoals": 0,
     });
 
-    expect(responseHttp.status).to.be.equals(422);
+    expect(responseHttp.status).to.be.equals(404);
     expect(responseHttp.body).to.deep.equal({ "message": "There is no team with such id!" }
     );
   });
