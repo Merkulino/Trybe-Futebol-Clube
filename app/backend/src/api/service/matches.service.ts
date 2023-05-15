@@ -15,6 +15,11 @@ const includeTeam = (team: string) => ({
 
 const INCLUDE_HOME_AWAY_TEAM = { include: [includeTeam('homeTeam'), includeTeam('awayTeam')] };
 
+type homeAwayGoalsType = {
+  homeTeamGoals: number,
+  awayTeamGoals: number,
+};
+
 export default class MatchesService {
   public static async allMatches(): Promise<TypeMatchesResponse | TypeResponse> {
     const matches = await Matches.findAll(INCLUDE_HOME_AWAY_TEAM);
@@ -48,5 +53,17 @@ export default class MatchesService {
     const matches = await Matches.update({ inProgress: false }, { where: { id } });
     if (!matches) return { type: 500, message: ERROR_SERVER_MESSAGE };
     return { message: 'Finished' };
+  }
+
+  public static async updateMatchGoals(id: number, goalsData: homeAwayGoalsType):
+  Promise<TypeResponse | TypeMatchesResponse> {
+    const matches = await Matches.update({
+      homeTeamGoals: goalsData.homeTeamGoals,
+      awayTeamGoals: goalsData.awayTeamGoals,
+    }, { where: { id } });
+
+    if (!matches) return { type: 500, message: ERROR_SERVER_MESSAGE };
+
+    return { message: 'Match updated!' };
   }
 }

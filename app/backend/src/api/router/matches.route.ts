@@ -20,6 +20,13 @@ router.get(
 );
 
 router.patch(
+  '/:id',
+  validateTokenMiddleware,
+  // Funcionalidade extra: validar campos da requisição
+  (req, res) => MatchesController.updateMatchGoals(req, res),
+);
+
+router.patch(
   '/:id/finish',
   validateTokenMiddleware,
   (req, res) => MatchesController.endMatch(req, res),

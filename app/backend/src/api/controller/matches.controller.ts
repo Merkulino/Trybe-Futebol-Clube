@@ -30,4 +30,12 @@ export default class MatchesController {
     if (type) return res.status(type).json({ message });
     return res.status(200).send({ message });
   }
+
+  static async updateMatchGoals(req: Request, res: Response) {
+    const { id } = req.params;
+    const dataGoals = req.body;
+    const { type, message } = await MatchesService.updateMatchGoals(Number(id), dataGoals);
+    if (type) return res.status(type).json({ message });
+    return res.status(200).send({ message });
+  }
 }
