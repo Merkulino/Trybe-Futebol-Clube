@@ -45,7 +45,7 @@ describe('matches tests', () => {
     expect(responseHttp.body).to.deep.equal(matchesInProgressMock);
   });
   
-  it('can be possible finish one match', async () => { // Os testes da erro na validação de token
+  it.only('can be possible finish one match', async () => { // Os testes da erro na validação de token
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai

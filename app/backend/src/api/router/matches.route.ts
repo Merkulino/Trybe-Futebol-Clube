@@ -1,5 +1,6 @@
 import * as express from 'express';
 import MatchesController from '../controller/matches.controller';
+import { validateTokenMiddleware } from '../middleware/validateInputs';
 
 const router = express.Router();
 
@@ -16,6 +17,12 @@ router.get(
 router.get(
   '/:id',
   (req, res) => MatchesController.matchById(req, res),
+);
+
+router.patch(
+  '/:id/finish',
+  validateTokenMiddleware,
+  (req, res) => MatchesController.endMatch(req, res),
 );
 
 export default router;
