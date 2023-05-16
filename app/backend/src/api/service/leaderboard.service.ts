@@ -1,41 +1,60 @@
-import { TypeLeaderboardResponse, TypeResponse } from '../../interfaces/types';
+import {
+  MatchGoalsType,
+  TeamsMatchesType,
+  TypeLeaderboardResponse,
+  TypeResponse,
+} from '../../interfaces/types';
 import Teams from '../../database/models/TeamsModel';
 import Matches from '../../database/models/Matches';
 
-const includeTeam = (team: string) => ({
-  model: Teams,
+const includeMatches = (team: string) => ({
+  model: Matches,
   as: team,
-  required: true,
-  attributes: { exclude: ['id'] },
+  where: { inProgress: false },
+  attributes: { exclude: ['id', 'inProgress', 'homeTeamId', 'awayTeamId'] },
 });
 
-// const INCLUDE_HOME_AWAY_TEAM = { include: [includeTeam('homeTeam'), includeTeam('awayTeam')] };
+const INCLUDE_HOME_AWAY_MATCH = {
+  include: [includeMatches('homeMatch'), includeMatches('awayMatch')],
+};
 
-const INCLUDE_HOME_TEAM = { include: [includeTeam('homeTeam')] };
+// Função Total Points
 
-// const INCLUDE_AWAY_TEAM = { include: [includeTeam('awayTeam')] };
+// Função Total Games
 
 export default class LeaderboardService {
-  public static async getHomeLeaderboard(): Promise<TypeResponse | TypeLeaderboardResponse> {
-    const response = await Matches.findAll({
-      ...INCLUDE_HOME_TEAM,
-      where: { inProgress: false },
-      attributes: { exclude: ['inProgress'] },
-      order: ['home_team_id'],
-    });
-    if (!response) return { type: 500, message: 'Was not possible to get role' };
+  public static countGoals(match: MatchGoalsType[], currency: 'home' | 'away'): number {
+    const count = match.reduce((acc, curr) => acc + curr[`${currency}TeamGoals`], 0);
+    return count;
+  }
 
-    const newObj = response.map(({ dataValues: dV }) => ({
-      name: dV.homeTeam.teamName,
+  public static getGoalsFavor(team: TeamsMatchesType): number {
+    return this.countGoals(team.homeMatch, 'home') + this.countGoals(team.awayMatch, 'away');
+  }
+
+  public static getGoalsOwn(team: TeamsMatchesType): number {
+    return this.countGoals(team.homeMatch, 'away') + this.countGoals(team.awayMatch, 'home');
+  }
+
+  public static async findAllTeamsGames(): Promise<TeamsMatchesType[]> {
+    const response = await Teams.findAll({ ...INCLUDE_HOME_AWAY_MATCH });
+    return response as unknown as TeamsMatchesType[];
+  }
+
+  public static async getHomeLeaderboard(): Promise<TypeResponse | TypeLeaderboardResponse> {
+    const response = await LeaderboardService.findAllTeamsGames();
+
+    const newObj = response.map((team) => ({
+      name: team.teamName,
       totalPoints: 13,
-      totalGames: 5,
+      totalGames: team.homeMatch.length + team.awayMatch.length,
       totalVictories: 4,
       totalDraws: 1,
       totalLosses: 0,
-      goalsFavor: 17,
-      // goalsOwn = 5,
-      // goalsBalance = 12,
-      // efficiency = 86.67,
+      goalsFavor: this.getGoalsFavor(team),
+      goalsOwn: this.getGoalsOwn(team),
+      goalsBalance: this.getGoalsFavor(team) - this.getGoalsOwn(team),
+      efficiency: 86.67,
     }));
 
     return { message: newObj };
