@@ -85,6 +85,8 @@ export default class MatchesService {
 
     if (!dataTeams) return { type: 500, message: ERROR_SERVER_MESSAGE };
 
-    return MatchesService.matchById(dataValues.id);
+    const matches = await Matches.findByPk(dataValues.id);
+
+    return { message: matches?.dataValues };
   }
 }

@@ -80,7 +80,7 @@ describe('matches tests', () => {
   it('add new match in progress', async () => { 
     sinon.stub(Teams, 'findAll').resolves(allTeams);
     sinon.stub(Matches, 'create').resolves(responseNewMatchMock);
-    sinon.stub(Matches, 'findByPk').resolves(responseNewMatchMock.dataValues);
+    sinon.stub(Matches, 'findByPk').resolves(responseNewMatchMock);
     sinon.stub(jwt, 'verify').resolves(userMock);
 
     const responseHttp = await chai
