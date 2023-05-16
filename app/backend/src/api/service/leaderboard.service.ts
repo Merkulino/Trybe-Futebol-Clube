@@ -1,4 +1,5 @@
 import {
+  LeaderboardType,
   MatchGoalsType,
   TeamsMatchesType,
   TypeLeaderboardResponse,
@@ -80,6 +81,19 @@ export default class LeaderboardService {
     return Number((Math.round(efficiencyNumber * 100) / 100).toFixed(2));
   }
 
+  public static sortTeams(teams: LeaderboardType[]): LeaderboardType[] {
+    return teams.sort((a, b) => {
+      if (a.totalPoints !== b.totalPoints) {
+        return b.totalPoints - a.totalPoints;
+      } if (a.totalVictories !== b.totalVictories) {
+        return b.totalVictories - a.totalVictories;
+      } if (a.goalsBalance !== b.goalsBalance) {
+        return b.goalsBalance - a.goalsBalance;
+      }
+      return b.goalsFavor - a.goalsFavor;
+    });
+  }
+
   public static async findAllTeamsGames(): Promise<TeamsMatchesType[]> {
     const response = await Teams.findAll({ ...INCLUDE_HOME_AWAY_MATCH });
     return response as unknown as TeamsMatchesType[];
@@ -101,6 +115,8 @@ export default class LeaderboardService {
       efficiency: this.getEfficencyTeam(team),
     }));
 
-    return { message: newObj };
+    const teamsSorted = this.sortTeams(newObj);
+
+    return { message: teamsSorted };
   }
 }

@@ -10,7 +10,7 @@ export type TypeMatchesResponse = {
   message: Matches[] | Matches
 };
 
-type LeaderboardType = {
+export type LeaderboardType = {
   name: string,
   totalPoints: number,
   totalGames: number,
