@@ -21,10 +21,6 @@ const INCLUDE_HOME_AWAY_MATCH = {
 
 type TeamStringType = 'home' | 'away';
 
-// Função Total Points
-
-// Função Total Games
-
 export default class LeaderboardService {
   public static countGoals(match: MatchGoalsType[], currency: TeamStringType): number {
     const count = match.reduce((acc, curr) => acc + curr[`${currency}TeamGoals`], 0);
@@ -51,11 +47,13 @@ export default class LeaderboardService {
   }
 
   public static getGoalsFavor(team: TeamsMatchesType): number {
-    return this.countGoals(team.homeMatch, 'home') + this.countGoals(team.awayMatch, 'away');
+    return this.countGoals(team.homeMatch, 'home');
+    // + this.countGoals(team.awayMatch, 'away');
   }
 
   public static getGoalsOwn(team: TeamsMatchesType): number {
-    return this.countGoals(team.homeMatch, 'away') + this.countGoals(team.awayMatch, 'home');
+    return this.countGoals(team.homeMatch, 'away');
+    // + this.countGoals(team.awayMatch, 'home');
   }
 
   /**
@@ -64,25 +62,25 @@ export default class LeaderboardService {
    * @index 2 for get all Points
   */
   private static mapDataPointsResults(team: TeamsMatchesType, index: number): number {
-    return this.countMatchesResult(team.homeMatch, 'home', 'away')[index]
-      + this.countMatchesResult(team.awayMatch, 'away', 'home')[index];
+    return this.countMatchesResult(team.homeMatch, 'home', 'away')[index];
+    // + this.countMatchesResult(team.awayMatch, 'away', 'home')[index];
   }
 
   public static getLosses(team: TeamsMatchesType): number {
-    return this.countMatchesResult(team.homeMatch, 'away', 'home')[0]
-      + this.countMatchesResult(team.awayMatch, 'home', 'away')[0];
+    return this.countMatchesResult(team.homeMatch, 'away', 'home')[0];
+    // + this.countMatchesResult(team.awayMatch, 'home', 'away')[0];
   }
 
   public static getEfficencyTeam(team: TeamsMatchesType): number {
     const efficiencyNumber = (
       (this.mapDataPointsResults(team, 2)
-        / ((team.homeMatch.length + team.awayMatch.length) * 3)
+        / ((team.homeMatch.length) * 3)
       ) * 100);
     return Number((Math.round(efficiencyNumber * 100) / 100).toFixed(2));
   }
 
   public static sortTeams(teams: LeaderboardType[]): LeaderboardType[] {
-    return teams.sort((a, b) => {
+    return teams.sort((a, b) => { // Feio Tenta refatorar
       if (a.totalPoints !== b.totalPoints) {
         return b.totalPoints - a.totalPoints;
       } if (a.totalVictories !== b.totalVictories) {
@@ -105,7 +103,7 @@ export default class LeaderboardService {
     const newObj = response.map((team) => ({
       name: team.teamName,
       totalPoints: this.mapDataPointsResults(team, 2),
-      totalGames: team.homeMatch.length + team.awayMatch.length,
+      totalGames: team.homeMatch.length,
       totalVictories: this.mapDataPointsResults(team, 0),
       totalDraws: this.mapDataPointsResults(team, 1),
       totalLosses: this.getLosses(team),
